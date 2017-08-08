@@ -41,6 +41,8 @@
 #define GCORE_STATUS_REGISTER 0x04
 #define GCORE_ADDR_REGISTER 0x08
 #define GCORE_DATA_REGISTER 0x0C
+#define GCORE_A1_STATUS_REGISTER 0x10
+#define GCORE_A2_STATUS_REGISTER 0x14
 
 
 /*
@@ -67,14 +69,22 @@ struct gcore_dev {
     struct completion *tx_cmp;	
     struct dma_chan *rx_chan;	
     struct completion *rx_cmp;
+
+    // offsets
     u32 control_offset;
     u32 status_offset;
     u32 addr_offset;
     u32 data_offset;
+    u32 a1_status_offset;
+    u32 a2_status_offset;
+
+    // contents
 	u32 control_reg;
 	u32 status_reg;
 	u32 addr_reg;
 	u32 data_reg;
+	u32 a1_status_reg;
+	u32 a2_status_reg;
 };
 
 
@@ -148,12 +158,16 @@ static void gcore_get_reg_info(struct gcore_system *gsys, struct gcore_registers
     gdev->status_reg = reg_read(gdev, gdev->status_offset); 
     gdev->addr_reg = reg_read(gdev, gdev->addr_offset); 
     gdev->data_reg = reg_read(gdev, gdev->data_offset);
+    gdev->a1_status_reg = reg_read(gdev, gdev->a1_status_offset); 
+    gdev->a2_status_reg = reg_read(gdev, gdev->a2_status_offset); 
     
     // save them to the struct
     registers->control = gdev->control_reg;
     registers->status = gdev->status_reg;
     registers->addr = gdev->addr_reg;
     registers->data = gdev->data_reg;
+    registers->a1_status = gdev->a1_status_reg;
+    registers->a2_status = gdev->a2_status_reg;
     
     return;
 }
@@ -615,13 +629,12 @@ static inline u32 subcore_ctrl_read(struct gcore_system *gsys, struct gcore_ctrl
         goto err_unlock;
     }
 
-    // read control, addr and data registers
-    gdev->status_reg = reg_read(gdev, gdev->status_offset); 
+    // read addr and data registers
     gdev->addr_reg = reg_read(gdev, gdev->addr_offset); 
     gdev->data_reg = reg_read(gdev, gdev->data_offset); 
     
     // set packet values
-    ctrl_packet->rank_select = (gdev->status_reg & GCORE_STATUS_CTRL_RANK_SEL_MASK) >> 9;
+    ctrl_packet->rank_select = 0;
     ctrl_packet->addr = gdev->addr_reg;
     ctrl_packet->data = gdev->data_reg;
     
@@ -1233,6 +1246,8 @@ static int gcore_create_device(struct platform_device *pdev, struct dma_chan *tx
     gdev->status_offset = GCORE_STATUS_REGISTER; 
     gdev->addr_offset = GCORE_ADDR_REGISTER; 
     gdev->data_offset = GCORE_DATA_REGISTER; 
+    gdev->a1_status_offset = GCORE_A1_STATUS_REGISTER; 
+    gdev->a2_status_offset = GCORE_A2_STATUS_REGISTER; 
     
     // read the initial register values from gemini_core
     gdev->control_reg = reg_read(gdev, gdev->control_offset); 
