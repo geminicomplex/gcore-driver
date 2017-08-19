@@ -1171,8 +1171,9 @@ static int gcore_dma_start(struct gcore_transfer *trans, bool measure_time)
 
     if(measure_time){
         do_gettimeofday(&tf);
-        printk(KERN_INFO "%s: dma sent %d bytes in time [us]: %ld at speed MB/s: %ld\n", MODULE_NAME, 
-                trans->buf_size, (tf.tv_usec - ti.tv_usec), trans->buf_size / (tf.tv_usec - ti.tv_usec));
+        trans->duration_usecs = (uint32_t)(tf.tv_usec - ti.tv_usec);
+        printk(KERN_DEBUG "%s: dma sent %d bytes in time [us]: %ld at speed MB/s: %ld\n", MODULE_NAME, 
+                trans->buf_size, trans->duration_usecs, trans->buf_size / trans->duration_usecs);
     }
 
 	return ret;

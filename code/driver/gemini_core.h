@@ -263,6 +263,7 @@ struct gcore_transfer {
     u32 wait;	/* true/false */
     u32 wait_time_msecs;
     u32 buf_size;
+    u32 duration_usecs;
 };
 
 
