@@ -1,16 +1,11 @@
-#ifndef GCORE_H
-#define GCORE_H
+#ifndef GCORE_COMMON_H
+#define GCORE_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <linux/types.h>
-#include <asm/ioctl.h>
-
 #define u32 uint32_t
-
-#define MODULE_NAME	"gcore"
 
 // The max transfer length for the dma register is 
 // (2^23)-1 or 8388607 bytes. Use a size that's divisible
@@ -270,4 +265,4 @@ struct gcore_transfer {
 #ifdef __cplusplus
 }
 #endif
-#endif	/* GCORE_H */
+#endif	/* GCORE_COMMON_H */
