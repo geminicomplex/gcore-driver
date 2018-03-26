@@ -266,14 +266,19 @@ static inline u32 subcore_load(struct gcore_system *gsys)
    
     // select artix unit
     switch(gsys->artix_select){
-        case NONE:
+        case ARTIX_SELECT_NONE:
             reg |= GCORE_ARTIX_SELECT_NONE;
             break;
-        case A1:
+        case ARTIX_SELECT_A1:
             reg |= GCORE_ARTIX_SELECT_A1;
             break;
-        case A2:
+        case ARTIX_SELECT_A2:
             reg |= GCORE_ARTIX_SELECT_A2;
+            break;
+        case ARTIX_SELECT_BOTH:
+            printk(KERN_ERR "%s: subcore load failed, \
+               cannot select both artix units.\n", MODULE_NAME);
+            return -1;
             break;
     }
 
@@ -367,7 +372,7 @@ static inline u32 subcore_load(struct gcore_system *gsys)
         case CTRL_RUN:
         case DMA_WRITE:
         case DMA_READ:
-            if (gsys->artix_select == NONE){
+            if (gsys->artix_select == ARTIX_SELECT_NONE){
                 printk(KERN_ERR "%s: subcore load: subcore %i selected but artix select is NONE.\n", 
                     MODULE_NAME, gsys->subcore_state);
                 return -1;
@@ -1307,7 +1312,7 @@ static int gcore_probe(struct platform_device *pdev)
 
     // gcore system init
     gsys->subcore_state = SUBCORE_IDLE; 
-    gsys->artix_select = NONE;
+    gsys->artix_select = ARTIX_SELECT_NONE;
     gsys->is_busy = 0;
     spin_lock_init(&gsys->lock);
 	mutex_init(&gsys->sem);

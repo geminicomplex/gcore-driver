@@ -196,9 +196,10 @@ enum memcore_states {
  *
  */
 enum artix_selects {
-    NONE,
-    A1,
-    A2
+    ARTIX_SELECT_NONE,
+    ARTIX_SELECT_A1,
+    ARTIX_SELECT_A2,
+    ARTIX_SELECT_BOTH
 };
 
 /*
