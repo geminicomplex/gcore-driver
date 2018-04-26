@@ -1,7 +1,7 @@
 /*
  * Wrapper Driver used to control a two-channel Xilinx DMA Engine
  */
-#include "gemini_core.h"
+#include "gcore.h"
 
 #include <linux/version.h>
 #include <linux/kernel.h>
@@ -670,13 +670,13 @@ static int gcore_open(struct inode *inode, struct file *file)
         goto error;
     }
 
-	if (gsys->is_busy) {
-		status = -EBUSY;
-        goto error;
-	}
+	//if (gsys->is_busy) {
+	//	status = -EBUSY;
+    //    goto error;
+	//}
 
 	file->private_data = gsys;
-    gsys->is_busy = 1;
+    //gsys->is_busy = 1;
     gsys->endian_swap = 0;
 
 error:
