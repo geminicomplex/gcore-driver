@@ -61,10 +61,10 @@ extern "C" {
 #define GCORE_AGENT_STARTUP_DONE_MASK    (1 << 19)
 #define GCORE_AGENT_DONE_MASK            (1 << 18)
 #define GCORE_AGENT_ERROR_MASK           (1 << 17)
-#define GCORE_AGENT_DUTCORE_FAILED_MASK  (1 << 16)
-#define GCORE_AGENT_DUTCORE_STAGE_MASK   (0x0000F000)
+#define GCORE_AGENT_GVPU_FAILED_MASK     (1 << 16)
+#define GCORE_AGENT_GVPU_STAGE_MASK      (0x0000F000)
 #define GCORE_AGENT_MEMCORE_STATE_MASK   (0x00000F00)
-#define GCORE_AGENT_DUTCORE_STATE_MASK   (0x000000F0)
+#define GCORE_AGENT_GVPU_STATE_MASK      (0x000000F0)
 #define GCORE_AGENT_STATE_MASK           (0x0000000F)
 
 /*
@@ -148,20 +148,20 @@ enum agent_states {
     AGENT_PAUSED = 0x00000002,
     STATUS       = 0x00000003,
     BURST_LOAD   = 0x00000004,
-    DUT_LOAD     = 0x00000005,
-    DUT_RUN      = 0x00000006,
-    DUT_WRITE    = 0x00000007,
-    DUT_READ     = 0x00000008,
-    DUT_RESET    = 0x00000009
+    GVPU_LOAD    = 0x00000005,
+    GVPU_RUN     = 0x00000006,
+    GVPU_WRITE   = 0x00000007,
+    GVPU_READ    = 0x00000008,
+    GVPU_RESET   = 0x00000009
 };
 
 /*
- * artix_core dutcore states
+ * artix_core gvpu states
  */
 
-enum dutcore_states {
-    DUTCORE_IDLE    = 0x00000000,
-    DUTCORE_PAUSED  = 0x00000001,
+enum gvpu_states {
+    GVPU_IDLE       = 0x00000000,
+    GVPU_PAUSED     = 0x00000001,
     MEM_BURST       = 0x00000002,
     MEM_LOAD        = 0x00000003,
     MEM_RUN         = 0x00000004,
