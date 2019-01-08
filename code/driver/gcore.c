@@ -441,8 +441,8 @@ static inline u32 subcore_load(struct gcore_system *gsys)
 static inline u32 subcore_run(struct gcore_system *gsys)
 {
     struct gcore_dev *gdev = gsys->gdev;
-    u32 rc = 0;
-    u32 reg = 0x00000000;
+    u32 rc_run = 0, rc_running = 0;
+    u32 reg_run = 0x00000000, reg_running = 0x00000000;
     
     gdev->status_reg = reg_read(gdev, gdev->status_offset); 
     if((gdev->status_reg & GCORE_STATUS_PAUSED_MASK) != GCORE_STATUS_PAUSED_MASK){
@@ -457,18 +457,18 @@ static inline u32 subcore_run(struct gcore_system *gsys)
     reg_write(gdev, gdev->control_offset, gdev->control_reg);
 
     // wail until control reg load bit de-asserts
-    reg = 0;
-    rc = readl_poll_timeout (
+    reg_run = 0;
+    rc_run = readl_poll_timeout (
         gdev->regs+gdev->control_offset, 
-        reg, 
-        !(reg & GCORE_CONTROL_RUN_MASK), 
-        250, // delay us
+        reg_run, 
+        !(reg_run & GCORE_CONTROL_RUN_MASK), 
+        0, // delay us
         10000 // timout us
     );
     
     // Run bit will de-assert right after subcore gets it,
     // so error out if it doesn't.
-    if(rc){
+    if(rc_run){
         printk(KERN_ERR "%s: subcore run bit failed to de-assert.\n", MODULE_NAME);
         return -ETIMEDOUT;
     }
@@ -477,26 +477,25 @@ static inline u32 subcore_run(struct gcore_system *gsys)
     // waiting for the run command. Agent startup takes
     // at least ~1 sec for init calib to complete so 
     // set timeout to 2 seconds.
-    reg = 0;
-    rc = readl_poll_timeout (
+    rc_running = readl_poll_timeout (
         gdev->regs+gdev->status_offset, 
-        reg, 
-        (reg & GCORE_STATUS_RUNNING_MASK), 
-        250, // delay us
+        reg_running, 
+        (reg_running & GCORE_STATUS_RUNNING_MASK), 
+        0, // delay us
         2000000 // timout us
     );
     
-    if(rc){
-        reg = reg_read(gdev, gdev->status_offset); 
-        if((reg & GCORE_STATUS_INIT_ERROR_MASK) == GCORE_STATUS_INIT_ERROR_MASK){
+    if(rc_running){
+        reg_running = reg_read(gdev, gdev->status_offset); 
+        if((reg_running & GCORE_STATUS_INIT_ERROR_MASK) == GCORE_STATUS_INIT_ERROR_MASK){
             printk(KERN_ERR 
                 "%s: subcore ran but init_error asserted with code 0x%08X.\n", 
-                MODULE_NAME, reg & GCORE_STATUS_ERROR_CODE_MASK);
+                MODULE_NAME, reg_running & GCORE_STATUS_ERROR_CODE_MASK);
             return -1;
-        }else if((reg & GCORE_STATUS_DONE_ERROR_MASK) == GCORE_STATUS_DONE_ERROR_MASK){
+        }else if((reg_running & GCORE_STATUS_DONE_ERROR_MASK) == GCORE_STATUS_DONE_ERROR_MASK){
             printk(KERN_ERR 
                 "%s: subcore ran but done_error asserted with code 0x%08X.\n", 
-                MODULE_NAME, reg & GCORE_STATUS_ERROR_CODE_MASK);
+                MODULE_NAME, reg_running & GCORE_STATUS_ERROR_CODE_MASK);
             return -1;
         }else {
             printk(KERN_ERR "%s: subcore running bit failed to assert.\n", MODULE_NAME);
