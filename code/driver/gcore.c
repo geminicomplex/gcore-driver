@@ -651,6 +651,85 @@ err_unlock:
 }
 
 /*
+ * Asserts or de-asserts artix sync line, which goes to both artix units.
+ * Pass a zero or one through ctrl_packet data. 
+ *
+ */
+static inline u32 artix_sync(struct gcore_system *gsys, struct gcore_ctrl_packet *ctrl_packet)
+{
+    u32 rc = 0;
+	u32 ret = 0;
+    u32 reg = 0x00000000;
+    struct gcore_dev *gdev = gsys->gdev;
+    u32 good_val = 0x00000000;
+
+    // lock
+    ret = mutex_lock_interruptible(&gsys->sem);
+    if (ret){
+        goto err_unlock;
+    }
+
+    if((ctrl_packet->data & 0x00000001) == 1) {
+        good_val = GCORE_STATUS_SYNCED_MASK;
+    }else if((ctrl_packet->data & 0x00000001) == 0){
+        good_val = 0x00000000;
+    }else{
+        printk(KERN_ERR "%s: invalid sync value given in data register.\n", MODULE_NAME);
+        ret = -EINVAL;
+        goto err_unlock;
+    }
+
+    
+    // write to data reg since contro_sync look at data_reg[0]
+    // for sync value
+    gdev->data_reg = ctrl_packet->data;
+    reg_write(gdev, gdev->data_offset, gdev->data_reg);
+
+    // run control_sync
+    gdev->control_reg = reg_read(gdev, gdev->control_offset); 
+    gdev->control_reg |= GCORE_CONTROL_SYNC_MASK;
+    reg_write(gdev, gdev->control_offset, gdev->control_reg);
+
+    // check if control sync flag de-asserted
+    reg = 0;
+    rc = readl_poll_timeout (
+        gdev->regs+gdev->control_offset, 
+        reg, 
+        !(reg & GCORE_CONTROL_SYNC_MASK), 
+        0, // delay us
+        100000 // timout us
+    );
+
+    // timeout!
+    if(rc){
+        printk(KERN_ERR "%s: control register artix sync flag failed to de-assert.\n", MODULE_NAME);
+        ret = -ETIMEDOUT;
+        goto err_unlock;
+    }
+
+    // wait until we see sync in status
+    reg = 0;
+    rc = readl_poll_timeout (
+        gdev->regs+gdev->status_offset, 
+        reg, 
+        ((reg & GCORE_STATUS_SYNCED_MASK) == good_val), 
+        1, // delay us
+        10000 // timout us
+    );
+
+    // timeout!
+    if(rc){
+        printk(KERN_ERR "%s: failed to assert artix sync.\n", MODULE_NAME);
+        ret = -ETIMEDOUT;
+        goto err_unlock;
+    }
+
+err_unlock:
+    mutex_unlock(&gsys->sem);
+    return ret;
+}
+
+/*
  * =======================================================
  * File operation functions
  *
@@ -951,6 +1030,19 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
         mutex_unlock(&gsys->sem);
 
 		break;
+    case GCORE_ARTIX_SYNC:
+
+        // grab packet from user space
+        if (copy_from_user((void *)&ctrl_packet, (const void __user *)arg, sizeof(struct gcore_ctrl_packet)))
+			return -EFAULT;
+
+		printk(KERN_DEBUG "%s ioctl: GCORE_SYNC\n", MODULE_NAME);
+
+        ret = artix_sync(gsys, &ctrl_packet);
+        if (ret){
+            goto err_unlock;
+        }
+        break;
     /*
      * Subcore must be in ctrl_write state. Write to 
      * rank_sel, addr and data. Call this ioctl to pass
@@ -967,7 +1059,7 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             MODULE_NAME, ctrl_packet.addr, ctrl_packet.data);
         
         // write packet to subcore
-        ret = subcore_ctrl_write(gsys, &ctrl_packet);       
+        ret = subcore_ctrl_write(gsys, &ctrl_packet);
         if (ret){
             goto err_unlock;
         }

@@ -22,12 +22,13 @@ extern "C" {
 #define GCORE_SUBCORE_IDLE  	_IO(GCORE_IOCTL_BASE, 4)
 #define GCORE_SUBCORE_STATE     _IO(GCORE_IOCTL_BASE, 5)
 #define GCORE_SUBCORE_RESET	    _IO(GCORE_IOCTL_BASE, 6)
-#define GCORE_CTRL_WRITE        _IO(GCORE_IOCTL_BASE, 7)
-#define GCORE_CTRL_READ     	_IO(GCORE_IOCTL_BASE, 8)
-#define GCORE_DMA_CONFIG	    _IO(GCORE_IOCTL_BASE, 9)
-#define GCORE_DMA_PREP		    _IO(GCORE_IOCTL_BASE, 10)
-#define GCORE_DMA_START	        _IO(GCORE_IOCTL_BASE, 11)
-#define GCORE_DMA_STOP	        _IO(GCORE_IOCTL_BASE, 12)
+#define GCORE_ARTIX_SYNC        _IO(GCORE_IOCTL_BASE, 7)
+#define GCORE_CTRL_WRITE        _IO(GCORE_IOCTL_BASE, 8)
+#define GCORE_CTRL_READ     	_IO(GCORE_IOCTL_BASE, 9)
+#define GCORE_DMA_CONFIG	    _IO(GCORE_IOCTL_BASE, 10)
+#define GCORE_DMA_PREP		    _IO(GCORE_IOCTL_BASE, 11)
+#define GCORE_DMA_START	        _IO(GCORE_IOCTL_BASE, 12)
+#define GCORE_DMA_STOP	        _IO(GCORE_IOCTL_BASE, 13)
 
 // control reg
 #define GCORE_CONTROL_RUN_MASK          (1 << 0)
@@ -37,6 +38,7 @@ extern "C" {
 #define GCORE_CONTROL_WRITE_MASK        (1 << 4)
 #define GCORE_CONTROL_STATE_MASK        (1 << 5)
 #define GCORE_CONTROL_RANK_SELECT_MASK  (1 << 6)
+#define GCORE_CONTROL_SYNC_MASK         (1 << 7)
 
 // status reg
 #define GCORE_STATUS_IDLE_MASK         (1 << 0)
