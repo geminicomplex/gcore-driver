@@ -173,7 +173,8 @@ enum gvpu_states {
     TEST_INIT       = 0x00000008,
     TEST_SETUP      = 0x00000009,
     TEST_RUN        = 0x0000000A,
-    TEST_CLEANUP    = 0x0000000B
+    TEST_CHECK      = 0x0000000B,
+    TEST_CLEANUP    = 0x0000000C
 };
 
 /*
