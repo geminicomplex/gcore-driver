@@ -154,7 +154,8 @@ enum agent_states {
     GVPU_RUN     = 0x00000006,
     GVPU_WRITE   = 0x00000007,
     GVPU_READ    = 0x00000008,
-    GVPU_RESET   = 0x00000009
+    GVPU_CYCLE   = 0x00000009,
+    GVPU_RESET   = 0x0000000A
 };
 
 /*
@@ -173,7 +174,7 @@ enum gvpu_states {
     TEST_INIT       = 0x00000008,
     TEST_SETUP      = 0x00000009,
     TEST_RUN        = 0x0000000A,
-    TEST_CHECK      = 0x0000000B,
+    TEST_FAIL_PINS  = 0x0000000B,
     TEST_CLEANUP    = 0x0000000C
 };
 
