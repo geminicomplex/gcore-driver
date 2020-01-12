@@ -1012,7 +1012,7 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             200000 // timout us
         );
         if(rc){
-		    printk(KERN_DEBUG "%s ioctl: control status bit failed to de-assert\n", MODULE_NAME);
+		    printk(KERN_DEBUG "%s ioctl: control reg state bit failed to de-assert\n", MODULE_NAME);
             ret = -ETIMEDOUT;
             goto err_unlock;
         }
