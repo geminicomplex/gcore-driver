@@ -346,6 +346,10 @@ static inline u32 subcore_load(struct gcore_system *gsys)
             strcpy(state_name, "DMA_READ");
             reg |= GCORE_SUBCORE_MODE_DMA_READ;
             break;
+        case GPIO_DNA:
+            strcpy(state_name, "GPIO_DNA");
+            reg |= GCORE_SUBCORE_MODE_GPIO_DNA;
+            break;
         default:
             printk(KERN_ERR "%s: subcore load failed, invalid state 0x%08X.\n", 
                 MODULE_NAME, gsys->subcore_state);
@@ -377,6 +381,8 @@ static inline u32 subcore_load(struct gcore_system *gsys)
                     MODULE_NAME, gsys->subcore_state);
                 return -1;
             }
+            break;
+        case GPIO_DNA:
             break;
     }
     

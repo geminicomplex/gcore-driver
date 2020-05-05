@@ -94,7 +94,21 @@ extern "C" {
 #define GCORE_SUBCORE_MODE_CTRL_RUN      0x0000000C
 #define GCORE_SUBCORE_MODE_DMA_WRITE     0x0000000D
 #define GCORE_SUBCORE_MODE_DMA_READ      0x0000000E
+#define GCORE_SUBCORE_MODE_GPIO_DNA      0x0000000F
 
+/*
+ * Subcore gpio dna commands
+ */
+#define SUBCORE_GPIO_DNA_CMD_NONE          (0x00000000)
+#define SUBCORE_GPIO_DNA_CMD_BOOT_DONE     (0x00000001)
+#define SUBCORE_GPIO_DNA_CMD_SET_RED_LED   (0x00000002)
+#define SUBCORE_GPIO_DNA_CMD_SET_GREEN_LED (0x00000003)
+#define SUBCORE_GPIO_DNA_CMD_GET_DNA       (0x00000004)
+
+/*
+ * DMA direction
+ *
+ */
 enum gcore_direction {
     GCORE_MEM_TO_DEV,
     GCORE_DEV_TO_MEM,
@@ -138,7 +152,8 @@ enum subcore_states {
     CTRL_READ       = 0x0000000B,
     CTRL_RUN        = 0x0000000C,
     DMA_WRITE       = 0x0000000D,
-    DMA_READ        = 0x0000000E
+    DMA_READ        = 0x0000000E,
+    GPIO_DNA        = 0x0000000F
 };
 
 /*
