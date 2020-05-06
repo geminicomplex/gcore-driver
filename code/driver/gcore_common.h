@@ -169,7 +169,7 @@ enum agent_states {
     GVPU_RUN     = 0x00000006,
     GVPU_WRITE   = 0x00000007,
     GVPU_READ    = 0x00000008,
-    GVPU_CYCLE   = 0x00000009,
+    GVPU_STATUS  = 0x00000009,
     GVPU_RESET   = 0x0000000A
 };
 
