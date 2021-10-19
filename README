@@ -1,0 +1,23 @@
+
+   ________               .__       .__ 
+  /  _____/  ____   _____ |__| ____ |__|
+ /   \  ____/ __ \ /     \|  |/    \|  |
+ \    \_\  \  ___/|  | |  \  |   |  \  |
+  \______  /\___  >__|_|  /__|___|  /__|
+         \/     \/      \/        \/    
+        GEMINI CORE DRIVER
+        gcore-driver v1.2.1
+
+
+===============================================================================
+OVERVIEW
+===============================================================================
+
+The Gemini Core Driver or gcore-driver is the Gemini Tester's Linux kernel
+driver. More specifically, gcore is a device driver for the Subcore IP
+subsystem running on the Zynq FPGA fabric. Its main function is to provide an
+ioctl call interface to userspace, for the purpose of configuring and
+controlling Subcore and performing DMA read/write transactions from Zynq RAM to
+the Agent IP module running on the Artix units.
+
+
