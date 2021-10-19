@@ -1,5 +1,8 @@
 /*
- * Wrapper Driver used to control a two-channel Xilinx DMA Engine
+ * gcore.h
+ *
+ * Copyright (c) 2015-2021 Gemini Complex Corporation. All rights reserved.
+ *
  */
 #include "gcore.h"
 
@@ -18,15 +21,13 @@
 #include <linux/cdev.h>
 #include <linux/io.h>
 #include <linux/iopoll.h>
-
+#include <linux/dma/xilinx_dma.h>
+#include <linux/platform_device.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
 #include <linux/dma-mapping.h>
 #include <linux/dmaengine.h>
 #include <xen/page.h>
-
-#include <linux/dma/xilinx_dma.h>
-#include <linux/platform_device.h>
 
 #define DMA_SIZE_HALF (DMA_SIZE/2)
 

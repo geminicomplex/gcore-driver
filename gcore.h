@@ -1,3 +1,9 @@
+/*
+ * gcore.h
+ *
+ * Copyright (c) 2015-2021 Gemini Complex Corporation. All rights reserved.
+ *
+ */
 #ifndef GCORE_H
 #define GCORE_H
 
