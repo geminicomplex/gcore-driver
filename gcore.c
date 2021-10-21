@@ -1,5 +1,5 @@
 /*
- * gcore.h
+ * gcore.c
  *
  * Copyright (c) 2015-2021 Gemini Complex Corporation. All rights reserved.
  *
