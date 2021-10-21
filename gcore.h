@@ -14,7 +14,7 @@ extern "C" {
 #include <linux/types.h>
 #include <asm/ioctl.h>
 
-#define MODULE_NAME	"gcore"
+#define MODULE_NAME    "gcore"
 
 #define u32 uint32_t
 
@@ -25,21 +25,21 @@ extern "C" {
 #define DMA_SIZE (8384512)
 
 // ioctl methods
-#define GCORE_IOCTL_BASE	    'W'
-#define GCORE_REGS_READ	        _IO(GCORE_IOCTL_BASE, 0)
-#define GCORE_USERDEVS_READ	    _IO(GCORE_IOCTL_BASE, 1)
+#define GCORE_IOCTL_BASE        'W'
+#define GCORE_REGS_READ         _IO(GCORE_IOCTL_BASE, 0)
+#define GCORE_USERDEVS_READ     _IO(GCORE_IOCTL_BASE, 1)
 #define GCORE_SUBCORE_LOAD      _IO(GCORE_IOCTL_BASE, 2)
 #define GCORE_SUBCORE_RUN       _IO(GCORE_IOCTL_BASE, 3)
-#define GCORE_SUBCORE_IDLE  	_IO(GCORE_IOCTL_BASE, 4)
+#define GCORE_SUBCORE_IDLE      _IO(GCORE_IOCTL_BASE, 4)
 #define GCORE_SUBCORE_STATE     _IO(GCORE_IOCTL_BASE, 5)
-#define GCORE_SUBCORE_RESET	    _IO(GCORE_IOCTL_BASE, 6)
+#define GCORE_SUBCORE_RESET     _IO(GCORE_IOCTL_BASE, 6)
 #define GCORE_ARTIX_SYNC        _IO(GCORE_IOCTL_BASE, 7)
 #define GCORE_CTRL_WRITE        _IO(GCORE_IOCTL_BASE, 8)
-#define GCORE_CTRL_READ     	_IO(GCORE_IOCTL_BASE, 9)
-#define GCORE_DMA_CONFIG	    _IO(GCORE_IOCTL_BASE, 10)
-#define GCORE_DMA_PREP		    _IO(GCORE_IOCTL_BASE, 11)
-#define GCORE_DMA_START	        _IO(GCORE_IOCTL_BASE, 12)
-#define GCORE_DMA_STOP	        _IO(GCORE_IOCTL_BASE, 13)
+#define GCORE_CTRL_READ         _IO(GCORE_IOCTL_BASE, 9)
+#define GCORE_DMA_CONFIG        _IO(GCORE_IOCTL_BASE, 10)
+#define GCORE_DMA_PREP          _IO(GCORE_IOCTL_BASE, 11)
+#define GCORE_DMA_START         _IO(GCORE_IOCTL_BASE, 12)
+#define GCORE_DMA_STOP          _IO(GCORE_IOCTL_BASE, 13)
 
 // control reg
 #define GCORE_CONTROL_RUN_MASK          (1 << 0)
@@ -135,10 +135,10 @@ enum gcore_direction {
  *
  */
 struct gcore_userdev {
-    u32 tx_chan;	
-    u32 tx_cmp;	
-    u32 rx_chan;	
-    u32 rx_cmp;	
+    u32 tx_chan;    
+    u32 tx_cmp;    
+    u32 rx_chan;    
+    u32 rx_cmp;    
 };
 
 /*
@@ -249,10 +249,10 @@ struct gcore_cfg {
  *
  */
 struct gcore_registers {
-    u32 control;	
-    u32 status;	
-    u32 addr;	
-    u32 data;	
+    u32 control;    
+    u32 status;    
+    u32 addr;    
+    u32 data;    
     u32 a1_status;
     u32 a2_status;
 };
@@ -277,15 +277,15 @@ struct gcore_chan_cfg {
     enum gcore_direction dir;
     u32 buf_offset;
     u32 buf_size;
-    u32 completion;	
+    u32 completion;    
     u32 cookie;
 };
 
 struct gcore_transfer {
     u32 chan;
-    u32 completion;	
+    u32 completion;    
     u32 cookie;
-    u32 wait;	/* true/false */
+    u32 wait;    /* true/false */
     u32 wait_time_msecs;
     u32 buf_size;
     u32 duration_usecs;
@@ -294,4 +294,4 @@ struct gcore_transfer {
 #ifdef __cplusplus
 }
 #endif
-#endif	/* GCORE_H */
+#endif  /* GCORE_H */

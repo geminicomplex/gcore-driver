@@ -64,11 +64,11 @@
  *
  */
 struct gcore_dev {
-	void __iomem *regs;
+    void __iomem *regs;
     struct resource *res;
-    struct dma_chan *tx_chan;	
-    struct completion *tx_cmp;	
-    struct dma_chan *rx_chan;	
+    struct dma_chan *tx_chan;
+    struct completion *tx_cmp;
+    struct dma_chan *rx_chan;
     struct completion *rx_cmp;
 
     // offsets
@@ -80,12 +80,12 @@ struct gcore_dev {
     u32 a2_status_offset;
 
     // contents
-	u32 control_reg;
-	u32 status_reg;
-	u32 addr_reg;
-	u32 data_reg;
-	u32 a1_status_reg;
-	u32 a2_status_reg;
+    u32 control_reg;
+    u32 status_reg;
+    u32 addr_reg;
+    u32 data_reg;
+    u32 a1_status_reg;
+    u32 a2_status_reg;
 };
 
 
@@ -107,8 +107,8 @@ struct gcore_system {
 
     // locks
     spinlock_t lock;
-    struct mutex sem;    
-    
+    struct mutex sem;
+
     // driver
     struct device *dev;
     dev_t chrdev_num;
@@ -119,7 +119,7 @@ struct gcore_system {
     char *buffer;
     size_t buffer_size;
     dma_addr_t dma_handle;
-	
+
     // bitstream
     bool endian_swap;
 };
@@ -143,12 +143,12 @@ static void gcore_dma_stop(struct dma_chan *chan);
 
 static inline void reg_write(struct gcore_dev *gdev, u32 reg, u32 value)
 {
-	iowrite32(value, gdev->regs + reg);
+    iowrite32(value, gdev->regs + reg);
 }
 
 static inline u32 reg_read(struct gcore_dev *gdev, u32 reg)
 {
-	return ioread32(gdev->regs + reg);
+    return ioread32(gdev->regs + reg);
 }
 
 static void gcore_get_reg_info(struct gcore_system *gsys, struct gcore_registers *registers)
@@ -190,28 +190,28 @@ static void gcore_get_userdev_info(struct gcore_system *gsys, struct gcore_userd
             udev->tx_cmp = (u32) gdev->tx_cmp;
             udev->rx_chan = (u32) gdev->rx_chan;
             udev->rx_cmp = (u32) gdev->rx_cmp;
-	        memcpy(userdev, udev, sizeof(struct gcore_userdev));
+            memcpy(userdev, udev, sizeof(struct gcore_userdev));
         }
     }
 }
 
 static enum dma_transfer_direction gcore_to_dma_direction(enum gcore_direction gcore_dir)
 {
-	enum dma_transfer_direction dma_dir;
+    enum dma_transfer_direction dma_dir;
 
-	switch (gcore_dir) {
-	case GCORE_MEM_TO_DEV:
-		dma_dir = DMA_MEM_TO_DEV;
-		break;
-	case GCORE_DEV_TO_MEM:
-		dma_dir = DMA_DEV_TO_MEM;
-		break;
-	default:
-		dma_dir = DMA_TRANS_NONE;
-		break;
-	}
+    switch (gcore_dir) {
+    case GCORE_MEM_TO_DEV:
+        dma_dir = DMA_MEM_TO_DEV;
+        break;
+    case GCORE_DEV_TO_MEM:
+        dma_dir = DMA_DEV_TO_MEM;
+        break;
+    default:
+        dma_dir = DMA_TRANS_NONE;
+        break;
+    }
 
-	return dma_dir;
+    return dma_dir;
 }
 
 /*
@@ -556,7 +556,7 @@ error:
  */
 static inline u32 subcore_ctrl_write(struct gcore_system *gsys, struct gcore_ctrl_packet *ctrl_packet) {
     struct gcore_dev *gdev = gsys->gdev;
-	int ret = 0;
+    int ret = 0;
     u32 rc = 0;
     u32 reg = 0x00000000;
 
@@ -609,7 +609,7 @@ err_unlock:
  */
 static inline u32 subcore_ctrl_read(struct gcore_system *gsys, struct gcore_ctrl_packet *ctrl_packet) {
     struct gcore_dev *gdev = gsys->gdev;
-	int ret = 0;
+    int ret = 0;
     u32 rc = 0;
     u32 reg = 0x00000000;
 
@@ -665,7 +665,7 @@ err_unlock:
 static inline u32 artix_sync(struct gcore_system *gsys, struct gcore_ctrl_packet *ctrl_packet)
 {
     u32 rc = 0;
-	u32 ret = 0;
+    u32 ret = 0;
     u32 reg = 0x00000000;
     struct gcore_dev *gdev = gsys->gdev;
     u32 good_val = 0x00000000;
@@ -751,22 +751,22 @@ static int gcore_open(struct inode *inode, struct file *file)
     gsys = container_of(inode->i_cdev, struct gcore_system, chrdev);
 
     status = mutex_lock_interruptible(&gsys->sem);
-	if (status){
+    if (status){
         goto error;
     }
 
-	//if (gsys->is_busy) {
-	//	status = -EBUSY;
+    //if (gsys->is_busy) {
+    //    status = -EBUSY;
     //    goto error;
-	//}
+    //}
 
-	file->private_data = gsys;
+    file->private_data = gsys;
     //gsys->is_busy = 1;
     gsys->endian_swap = 0;
 
 error:
     mutex_unlock(&gsys->sem);
-	return status;
+    return status;
 }
 
 
@@ -779,7 +779,7 @@ static int gcore_release(struct inode *inode, struct file *file)
     struct gcore_system *gsys = file->private_data;
     gsys->is_busy = 0;
     printk(KERN_DEBUG "%s file: close()\n", MODULE_NAME);
-	return 0;
+    return 0;
 }
 
 /*
@@ -836,14 +836,14 @@ error:
  *
  */
 static ssize_t gcore_write(struct file *file, const char __user * buf,
-	size_t len, loff_t * off)
+    size_t len, loff_t * off)
 {
     u32 status = 0;
     struct gcore_system *gsys = file->private_data;
 
     printk(KERN_DEBUG "%s file: write()\n", MODULE_NAME);
     
-	status = mutex_lock_interruptible(&gsys->sem);
+    status = mutex_lock_interruptible(&gsys->sem);
     if(status){
         goto error;
     }
@@ -882,30 +882,30 @@ error:
  */
 static int gcore_mmap(struct file *file, struct vm_area_struct *vma)
 {
-	int result;
-	unsigned long requested_size;
+    int result;
+    unsigned long requested_size;
     struct gcore_system *gsys = file->private_data;
-	
+    
     requested_size = vma->vm_end - vma->vm_start;
 
-	printk(KERN_DEBUG "%s: file: mmap()\n", MODULE_NAME);
-	printk(KERN_DEBUG "%s: file: dma buffer size: %d, mmap size requested: %lu\n",
-	       MODULE_NAME, DMA_SIZE, requested_size);
+    printk(KERN_DEBUG "%s: file: mmap()\n", MODULE_NAME);
+    printk(KERN_DEBUG "%s: file: dma buffer size: %d, mmap size requested: %lu\n",
+           MODULE_NAME, DMA_SIZE, requested_size);
 
-	if (requested_size > DMA_SIZE) {
-		printk(KERN_ERR "%s: %d reserved != %lu requested)\n",
-		       MODULE_NAME, DMA_SIZE, requested_size);
+    if (requested_size > DMA_SIZE) {
+        printk(KERN_ERR "%s: %d reserved != %lu requested)\n",
+               MODULE_NAME, DMA_SIZE, requested_size);
 
-		return -EAGAIN;
-	}
+        return -EAGAIN;
+    }
 
     if (vma->vm_pgoff == 0) {
-	    printk(KERN_DEBUG "%s: file: mmap using dma_mmap_coherent\n", 
+        printk(KERN_DEBUG "%s: file: mmap using dma_mmap_coherent\n", 
             MODULE_NAME);
         result = dma_mmap_coherent(NULL, vma, gsys->buffer, 
             gsys->dma_handle, requested_size);
     } else {
-	    printk(KERN_DEBUG "%s: file: mmap using remap_pfn_range\n", 
+        printk(KERN_DEBUG "%s: file: mmap using remap_pfn_range\n", 
                 MODULE_NAME);
         vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
         vma->vm_flags |= VM_IO;
@@ -914,15 +914,15 @@ static int gcore_mmap(struct file *file, struct vm_area_struct *vma)
             requested_size, vma->vm_page_prot);
     }
 
-	if (result < 0 ) {
-		printk(KERN_ERR
-		       "%s: error in calling remap_pfn_range: returned %d\n",
-		       MODULE_NAME, result);
+    if (result < 0 ) {
+        printk(KERN_ERR
+               "%s: error in calling remap_pfn_range: returned %d\n",
+               MODULE_NAME, result);
 
-		return -EAGAIN;
-	}
+        return -EAGAIN;
+    }
 
-	return 0;
+    return 0;
 }
 
 static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
@@ -931,45 +931,45 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
     u32 reg = 0;
     struct gcore_system *gsys = file->private_data;
     struct gcore_dev *gdev = gsys->gdev;
-	long ret = 0;
-	struct gcore_registers registers;
-	struct gcore_userdev userdev;
-	struct gcore_cfg gcfg;
-	struct gcore_chan_cfg chan_cfg;
-	struct gcore_transfer trans;
-	struct gcore_ctrl_packet ctrl_packet;
+    long ret = 0;
+    struct gcore_registers registers;
+    struct gcore_userdev userdev;
+    struct gcore_cfg gcfg;
+    struct gcore_chan_cfg chan_cfg;
+    struct gcore_transfer trans;
+    struct gcore_ctrl_packet ctrl_packet;
     u32 chan;
 
-	switch (cmd) {
-	case GCORE_REGS_READ:
-		printk(KERN_DEBUG "%s ioctl: GCORE_REGS_READ\n", MODULE_NAME);
+    switch (cmd) {
+    case GCORE_REGS_READ:
+        printk(KERN_DEBUG "%s ioctl: GCORE_REGS_READ\n", MODULE_NAME);
 
-		if (copy_from_user((void *)&registers, (const void __user *)arg, sizeof(struct gcore_registers)))
-			return -EFAULT;
+        if (copy_from_user((void *)&registers, (const void __user *)arg, sizeof(struct gcore_registers)))
+            return -EFAULT;
 
-		gcore_get_reg_info(gsys, &registers);
+        gcore_get_reg_info(gsys, &registers);
 
-		if (copy_to_user((struct gcore_registers *)arg, &registers, sizeof(struct gcore_registers)))
-			return -EFAULT;
+        if (copy_to_user((struct gcore_registers *)arg, &registers, sizeof(struct gcore_registers)))
+            return -EFAULT;
 
-		break;
+        break;
     case GCORE_USERDEVS_READ:
-		printk(KERN_DEBUG "%s ioctl: GCORE_USERDEVS_READ\n", MODULE_NAME);
+        printk(KERN_DEBUG "%s ioctl: GCORE_USERDEVS_READ\n", MODULE_NAME);
 
-		if (copy_from_user((void *)&userdev, (const void __user *)arg, sizeof(struct gcore_userdev)))
-			return -EFAULT;
+        if (copy_from_user((void *)&userdev, (const void __user *)arg, sizeof(struct gcore_userdev)))
+            return -EFAULT;
 
-		gcore_get_userdev_info(gsys, &userdev);
+        gcore_get_userdev_info(gsys, &userdev);
 
-		if (copy_to_user((struct gcore_userdev *)arg, &userdev, sizeof(struct gcore_userdev)))
-			return -EFAULT;
+        if (copy_to_user((struct gcore_userdev *)arg, &userdev, sizeof(struct gcore_userdev)))
+            return -EFAULT;
 
-		break;
+        break;
     case GCORE_SUBCORE_LOAD:
-		printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_LOAD\n", MODULE_NAME);
+        printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_LOAD\n", MODULE_NAME);
 
-		if(copy_from_user((void *)&gcfg, (const void __user *)arg, sizeof(struct gcore_cfg)))
-			return -EFAULT;
+        if(copy_from_user((void *)&gcfg, (const void __user *)arg, sizeof(struct gcore_cfg)))
+            return -EFAULT;
         
         gsys->subcore_state = gcfg.subcore_state;
         gsys->artix_select = gcfg.artix_select;
@@ -982,7 +982,7 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
         mutex_unlock(&gsys->sem);
         break;
     case GCORE_SUBCORE_RUN:
-		printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_RUN\n", MODULE_NAME);
+        printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_RUN\n", MODULE_NAME);
         ret = mutex_lock_interruptible(&gsys->sem);
         if (ret){
             goto err_unlock;
@@ -991,7 +991,7 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
         mutex_unlock(&gsys->sem);
         break;
     case GCORE_SUBCORE_IDLE:
-		printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_IDLE\n", MODULE_NAME);
+        printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_IDLE\n", MODULE_NAME);
         
         ret = mutex_lock_interruptible(&gsys->sem);
         if (ret){
@@ -1001,9 +1001,9 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
         ret = subcore_idle(gsys);
         mutex_unlock(&gsys->sem);
 
-		break;
+        break;
     case GCORE_SUBCORE_STATE:
-		printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_STATE\n", MODULE_NAME);
+        printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_STATE\n", MODULE_NAME);
         ret = mutex_lock_interruptible(&gsys->sem);
         if (ret){
             goto err_unlock;
@@ -1019,14 +1019,14 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
             200000 // timout us
         );
         if(rc){
-		    printk(KERN_DEBUG "%s ioctl: control reg state bit failed to de-assert\n", MODULE_NAME);
+            printk(KERN_DEBUG "%s ioctl: control reg state bit failed to de-assert\n", MODULE_NAME);
             ret = -ETIMEDOUT;
             goto err_unlock;
         }
         mutex_unlock(&gsys->sem);       
         break;
     case GCORE_SUBCORE_RESET:
-		printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_RESET\n", MODULE_NAME);
+        printk(KERN_DEBUG "%s ioctl: GCORE_SUBCORE_RESET\n", MODULE_NAME);
         
         ret = mutex_lock_interruptible(&gsys->sem);
         if (ret){
@@ -1036,14 +1036,14 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
         ret = subcore_reset(gsys);
         mutex_unlock(&gsys->sem);
 
-		break;
+        break;
     case GCORE_ARTIX_SYNC:
 
         // grab packet from user space
         if (copy_from_user((void *)&ctrl_packet, (const void __user *)arg, sizeof(struct gcore_ctrl_packet)))
-			return -EFAULT;
+            return -EFAULT;
 
-		printk(KERN_DEBUG "%s ioctl: GCORE_SYNC\n", MODULE_NAME);
+        printk(KERN_DEBUG "%s ioctl: GCORE_SYNC\n", MODULE_NAME);
 
         ret = artix_sync(gsys, &ctrl_packet);
         if (ret){
@@ -1060,9 +1060,9 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
         
         // grab packet from user space
         if (copy_from_user((void *)&ctrl_packet, (const void __user *)arg, sizeof(struct gcore_ctrl_packet)))
-			return -EFAULT;
+            return -EFAULT;
         
-		printk(KERN_DEBUG "%s ioctl: GCORE_CTRL_WRITE: addr: 0x%08X data: 0x%08X\n", 
+        printk(KERN_DEBUG "%s ioctl: GCORE_CTRL_WRITE: addr: 0x%08X data: 0x%08X\n", 
             MODULE_NAME, ctrl_packet.addr, ctrl_packet.data);
         
         // write packet to subcore
@@ -1076,7 +1076,7 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
      * to read into rank_sel, addr and data.
      */
     case GCORE_CTRL_READ:
-		printk(KERN_DEBUG "%s ioctl: GCORE_CTRL_READ\n", MODULE_NAME);
+        printk(KERN_DEBUG "%s ioctl: GCORE_CTRL_READ\n", MODULE_NAME);
        
         // read packet from subcore
         ret = subcore_ctrl_read(gsys, &ctrl_packet);
@@ -1090,48 +1090,48 @@ static long gcore_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
         break;
     case GCORE_DMA_CONFIG:
-		printk(KERN_DEBUG "%s ioctl: GCORE_DMA_CONFIG\n", MODULE_NAME);
+        printk(KERN_DEBUG "%s ioctl: GCORE_DMA_CONFIG\n", MODULE_NAME);
 
-		if(copy_from_user((void *)&chan_cfg, (const void __user *)arg, sizeof(struct gcore_chan_cfg)))
-			return -EFAULT;
+        if(copy_from_user((void *)&chan_cfg, (const void __user *)arg, sizeof(struct gcore_chan_cfg)))
+            return -EFAULT;
 
-		gcore_chan_config(gsys, &chan_cfg);
-		break;
-	case GCORE_DMA_PREP:
-		printk(KERN_DEBUG "%s ioctl: GCORE_DMA_PREP\n", MODULE_NAME);
+        gcore_chan_config(gsys, &chan_cfg);
+        break;
+    case GCORE_DMA_PREP:
+        printk(KERN_DEBUG "%s ioctl: GCORE_DMA_PREP\n", MODULE_NAME);
 
-		if (copy_from_user((void *)&chan_cfg, (const void __user *)arg, sizeof(struct gcore_chan_cfg)))
-			return -EFAULT;
+        if (copy_from_user((void *)&chan_cfg, (const void __user *)arg, sizeof(struct gcore_chan_cfg)))
+            return -EFAULT;
 
-		ret = (long)gcore_chan_prep(gsys, &chan_cfg);
+        ret = (long)gcore_chan_prep(gsys, &chan_cfg);
 
-		if (copy_to_user((struct gcore_chan_cfg *)arg, &chan_cfg, sizeof(struct gcore_chan_cfg)))
-			return -EFAULT;
+        if (copy_to_user((struct gcore_chan_cfg *)arg, &chan_cfg, sizeof(struct gcore_chan_cfg)))
+            return -EFAULT;
 
-		break;
-	case GCORE_DMA_START:
-		printk(KERN_DEBUG "%s ioctl: GCORE_DMA_START\n",
-		       MODULE_NAME);
+        break;
+    case GCORE_DMA_START:
+        printk(KERN_DEBUG "%s ioctl: GCORE_DMA_START\n",
+               MODULE_NAME);
 
-		if (copy_from_user((void *)&trans, (const void __user *)arg, sizeof(struct gcore_transfer)))
-			return -EFAULT;
+        if (copy_from_user((void *)&trans, (const void __user *)arg, sizeof(struct gcore_transfer)))
+            return -EFAULT;
 
-		ret = (long)gcore_dma_start(&trans, true);
-		break;
-	case GCORE_DMA_STOP:
-		printk(KERN_DEBUG "%s ioctl: GCORE_DMA_STOP\n", MODULE_NAME);
+        ret = (long)gcore_dma_start(&trans, true);
+        break;
+    case GCORE_DMA_STOP:
+        printk(KERN_DEBUG "%s ioctl: GCORE_DMA_STOP\n", MODULE_NAME);
 
-		if (copy_from_user((void *)&chan,
-				   (const void __user *)arg, sizeof(u32)))
-			return -EFAULT;
+        if (copy_from_user((void *)&chan,
+                   (const void __user *)arg, sizeof(u32)))
+            return -EFAULT;
 
-		gcore_dma_stop((struct dma_chan *)chan);
-		break;
-	default:
-		break;
-	}
+        gcore_dma_stop((struct dma_chan *)chan);
+        break;
+    default:
+        break;
+    }
     
-	return ret;
+    return ret;
 
 err_unlock:
     mutex_unlock(&gsys->sem);
@@ -1148,28 +1148,28 @@ err_unlock:
 
 static void gcore_sync_callback(void *completion)
 {
-	complete(completion);
+    complete(completion);
 }
 
 static void gcore_chan_config(struct gcore_system *gsys, struct gcore_chan_cfg *chan_cfg)
 {
-	struct dma_chan *chan = (struct dma_chan *)chan_cfg->chan;
-	struct dma_slave_config config;
+    struct dma_chan *chan = (struct dma_chan *)chan_cfg->chan;
+    struct dma_slave_config config;
     
     switch (chan_cfg->dir) {
-	case GCORE_MEM_TO_DEV:
-		config.src_addr = gsys->dma_handle + chan_cfg->buf_offset;
-        config.dst_addr = gsys->dma_handle + chan_cfg->buf_offset;
-		break;
-	case GCORE_DEV_TO_MEM:
-		config.src_addr = gsys->dma_handle + chan_cfg->buf_offset;
+    case GCORE_MEM_TO_DEV:
+        config.src_addr = gsys->dma_handle + chan_cfg->buf_offset;
         config.dst_addr = gsys->dma_handle + chan_cfg->buf_offset;
         break;
-	default:
-		config.src_addr = gsys->dma_handle + chan_cfg->buf_offset;
+    case GCORE_DEV_TO_MEM:
+        config.src_addr = gsys->dma_handle + chan_cfg->buf_offset;
         config.dst_addr = gsys->dma_handle + chan_cfg->buf_offset;
         break;
-	}
+    default:
+        config.src_addr = gsys->dma_handle + chan_cfg->buf_offset;
+        config.dst_addr = gsys->dma_handle + chan_cfg->buf_offset;
+        break;
+    }
     
     config.src_addr_width = (u32)8; 
     config.dst_addr_width = (u32)8;
@@ -1178,9 +1178,9 @@ static void gcore_chan_config(struct gcore_system *gsys, struct gcore_chan_cfg *
     config.device_fc = 0;
     config.slave_id = 0;
 
-	if (chan) {
+    if (chan) {
         dmaengine_slave_config(chan, &config);
-	}
+    }
 }
 
 /*
@@ -1190,45 +1190,45 @@ static void gcore_chan_config(struct gcore_system *gsys, struct gcore_chan_cfg *
  */
 static int gcore_chan_prep(struct gcore_system *gsys,  struct gcore_chan_cfg *chan_cfg)
 {
-	int ret = 0;
-	struct dma_chan *chan;
-	dma_addr_t dma_buf;
-	size_t dma_len;
-	enum dma_transfer_direction dir;
-	enum dma_ctrl_flags flags;
-	struct dma_async_tx_descriptor *chan_desc;
-	struct completion *cmp;
-	dma_cookie_t cookie;
+    int ret = 0;
+    struct dma_chan *chan;
+    dma_addr_t dma_buf;
+    size_t dma_len;
+    enum dma_transfer_direction dir;
+    enum dma_ctrl_flags flags;
+    struct dma_async_tx_descriptor *chan_desc;
+    struct completion *cmp;
+    dma_cookie_t cookie;
 
-	chan = (struct dma_chan *)chan_cfg->chan;
-	cmp = (struct completion *)chan_cfg->completion;
-	dma_buf = gsys->dma_handle + chan_cfg->buf_offset;
-	dma_len = chan_cfg->buf_size;
-	dir = gcore_to_dma_direction(chan_cfg->dir);
+    chan = (struct dma_chan *)chan_cfg->chan;
+    cmp = (struct completion *)chan_cfg->completion;
+    dma_buf = gsys->dma_handle + chan_cfg->buf_offset;
+    dma_len = chan_cfg->buf_size;
+    dir = gcore_to_dma_direction(chan_cfg->dir);
 
-	flags = DMA_CTRL_ACK | DMA_PREP_INTERRUPT;
+    flags = DMA_CTRL_ACK | DMA_PREP_INTERRUPT;
 
-	chan_desc = dmaengine_prep_slave_single(chan, dma_buf, dma_len, dir, flags);
+    chan_desc = dmaengine_prep_slave_single(chan, dma_buf, dma_len, dir, flags);
 
-	if (!chan_desc) {
-		printk(KERN_ERR "%s: dmaengine_prep_slave_single error\n", MODULE_NAME);
-		ret = -1;
-		chan_cfg->cookie = (u32)-EBUSY;
-	} else {
-		chan_desc->callback = gcore_sync_callback;
-		chan_desc->callback_param = cmp;
+    if (!chan_desc) {
+        printk(KERN_ERR "%s: dmaengine_prep_slave_single error\n", MODULE_NAME);
+        ret = -1;
+        chan_cfg->cookie = (u32)-EBUSY;
+    } else {
+        chan_desc->callback = gcore_sync_callback;
+        chan_desc->callback_param = cmp;
 
-		// set the prepared descriptor to be executed by the engine
-		cookie = chan_desc->tx_submit(chan_desc);
-		if (dma_submit_error(cookie)) {
-			printk(KERN_ERR "%s: dma tx_submit error\n", MODULE_NAME);
-			ret = -1;
-		}
+        // set the prepared descriptor to be executed by the engine
+        cookie = chan_desc->tx_submit(chan_desc);
+        if (dma_submit_error(cookie)) {
+            printk(KERN_ERR "%s: dma tx_submit error\n", MODULE_NAME);
+            ret = -1;
+        }
 
-		chan_cfg->cookie = (u32)cookie;
-	}
+        chan_cfg->cookie = (u32)cookie;
+    }
 
-	return ret;
+    return ret;
 }
 
 /*
@@ -1237,40 +1237,40 @@ static int gcore_chan_prep(struct gcore_system *gsys,  struct gcore_chan_cfg *ch
  */
 static int gcore_dma_start(struct gcore_transfer *trans, bool measure_time)
 {
-	int ret = 0;
-	unsigned long tmo = msecs_to_jiffies(trans->wait_time_msecs);
-	enum dma_status status;
-	struct dma_chan *chan;
-	struct completion *cmp;
-	dma_cookie_t cookie;
-	struct timeval ti, tf;
+    int ret = 0;
+    unsigned long tmo = msecs_to_jiffies(trans->wait_time_msecs);
+    enum dma_status status;
+    struct dma_chan *chan;
+    struct completion *cmp;
+    dma_cookie_t cookie;
+    struct timeval ti, tf;
 
-	chan = (struct dma_chan *)trans->chan;
-	cmp = (struct completion *)trans->completion;
-	cookie = (dma_cookie_t)trans->cookie;
+    chan = (struct dma_chan *)trans->chan;
+    cmp = (struct completion *)trans->completion;
+    cookie = (dma_cookie_t)trans->cookie;
 
-	init_completion(cmp);
-	
+    init_completion(cmp);
+    
     if(measure_time){
         do_gettimeofday(&ti);
     }
-	
+    
     dma_async_issue_pending(chan);
 
-	if (trans->wait) {
-		tmo = wait_for_completion_timeout(cmp, tmo);
-		status = dma_async_is_tx_complete(chan, cookie, NULL, NULL);
-		if (0 == tmo) {
-			printk(KERN_ERR "%s: dma timed out\n", MODULE_NAME);
-			ret = -1;
-		} else if (status != DMA_COMPLETE) {
-			printk(KERN_DEBUG
-			       "%s transfer: returned completion callback status of: \'%s\'\n",
-			       MODULE_NAME,
-			       status == DMA_ERROR ? "error" : "in progress");
-			ret = -1;
-		}
-	}
+    if (trans->wait) {
+        tmo = wait_for_completion_timeout(cmp, tmo);
+        status = dma_async_is_tx_complete(chan, cookie, NULL, NULL);
+        if (0 == tmo) {
+            printk(KERN_ERR "%s: dma timed out\n", MODULE_NAME);
+            ret = -1;
+        } else if (status != DMA_COMPLETE) {
+            printk(KERN_DEBUG
+                   "%s transfer: returned completion callback status of: \'%s\'\n",
+                   MODULE_NAME,
+                   status == DMA_ERROR ? "error" : "in progress");
+            ret = -1;
+        }
+    }
 
     if(measure_time){
         do_gettimeofday(&tf);
@@ -1279,7 +1279,7 @@ static int gcore_dma_start(struct gcore_transfer *trans, bool measure_time)
                 trans->buf_size, trans->duration_usecs, trans->buf_size / trans->duration_usecs);
     }
 
-	return ret;
+    return ret;
 }
 
 /*
@@ -1288,13 +1288,13 @@ static int gcore_dma_start(struct gcore_transfer *trans, bool measure_time)
  */
 static void gcore_dma_stop(struct dma_chan *chan)
 {
-	if (chan) {
+    if (chan) {
         // this func is available kernel 4.5 and later
-		//dmaengine_terminate_sync(chan);
+        //dmaengine_terminate_sync(chan);
 
         // for now we use this deprecated crap
         dmaengine_terminate_all(chan);
-	}
+    }
 }
 
 /*
@@ -1312,23 +1312,23 @@ static int gcore_create_device(struct platform_device *pdev, struct dma_chan *tx
 {
     struct gcore_dev *gdev;
     struct resource *res;
-	struct completion *tx_cmp, *rx_cmp;
+    struct completion *tx_cmp, *rx_cmp;
     
     struct gcore_system *gsys = platform_get_drvdata(pdev);
     if(!gsys){
         return -1;        
     }
 
-	tx_cmp = (struct completion *)kzalloc(sizeof(struct completion), GFP_KERNEL);
+    tx_cmp = (struct completion *)kzalloc(sizeof(struct completion), GFP_KERNEL);
     if(!tx_cmp){
         return -ENOMEM;
     }
 
-	rx_cmp = (struct completion *)kzalloc(sizeof(struct completion), GFP_KERNEL);
+    rx_cmp = (struct completion *)kzalloc(sizeof(struct completion), GFP_KERNEL);
     if(!rx_cmp){
         return -ENOMEM;
     }
-	
+    
     gdev = (struct gcore_dev *)kzalloc(sizeof(struct gcore_dev), GFP_KERNEL);
     if(!gdev){
         return -ENOMEM;
@@ -1343,9 +1343,9 @@ static int gcore_create_device(struct platform_device *pdev, struct dma_chan *tx
     
     gdev->res = res;
     gdev->tx_chan = tx_chan;
-	gdev->tx_cmp = tx_cmp;
-	gdev->rx_chan = rx_chan;
-	gdev->rx_cmp = rx_cmp;
+    gdev->tx_cmp = tx_cmp;
+    gdev->rx_chan = rx_chan;
+    gdev->rx_cmp = rx_cmp;
     gdev->control_offset = GCORE_CONTROL_REGISTER; 
     gdev->status_offset = GCORE_STATUS_REGISTER; 
     gdev->addr_offset = GCORE_ADDR_REGISTER; 
@@ -1370,35 +1370,35 @@ static int gcore_probe(struct platform_device *pdev);
 static int gcore_remove(struct platform_device *pdev);
 
 static const struct of_device_id gemini_core_of_ids[] = {
-	{ .compatible = "xlnx,gemini-core-1.0",},
-	{}
+    { .compatible = "xlnx,gemini-core-1.0",},
+    {}
 };
 
 static struct file_operations fops = {
     .owner = THIS_MODULE,
     .open = gcore_open,
-	.release = gcore_release,
-	.read = gcore_read,
-	.write = gcore_write,
-	.mmap = gcore_mmap,
-	.unlocked_ioctl = gcore_ioctl,
+    .release = gcore_release,
+    .read = gcore_read,
+    .write = gcore_write,
+    .mmap = gcore_mmap,
+    .unlocked_ioctl = gcore_ioctl,
 };
 
 static struct platform_driver gemini_core_driver = {
-	.driver = {
-		.name = "gcore",
-		.owner = THIS_MODULE,
-		.of_match_table = gemini_core_of_ids,
-	},
+    .driver = {
+        .name = "gcore",
+        .owner = THIS_MODULE,
+        .of_match_table = gemini_core_of_ids,
+    },
     .probe = gcore_probe,
-	.remove = gcore_remove,
+    .remove = gcore_remove,
 };
 
 static int gcore_probe(struct platform_device *pdev)
 {
     struct gcore_system *gsys;
-	dma_cap_mask_t mask;
-	struct dma_chan *tx_chan, *rx_chan;
+    dma_cap_mask_t mask;
+    struct dma_chan *tx_chan, *rx_chan;
     int err;
     
     printk(KERN_DEBUG "%s: initializing...\n", MODULE_NAME);
@@ -1413,54 +1413,54 @@ static int gcore_probe(struct platform_device *pdev)
     gsys->artix_select = ARTIX_SELECT_NONE;
     gsys->is_busy = 0;
     spin_lock_init(&gsys->lock);
-	mutex_init(&gsys->sem);
+    mutex_init(&gsys->sem);
     
     // save gcore system in the kernel
-	platform_set_drvdata(pdev, gsys);
+    platform_set_drvdata(pdev, gsys);
     
     // create the chrdev
-	if (alloc_chrdev_region(&gsys->chrdev_num, 0, 1, MODULE_NAME) < 0) {
-		return -1;
-	}
+    if (alloc_chrdev_region(&gsys->chrdev_num, 0, 1, MODULE_NAME) < 0) {
+        return -1;
+    }
     
     // create the class
-	if ((gsys->class = class_create(THIS_MODULE, MODULE_NAME)) == NULL) {
-	    printk(KERN_ERR "%s: init failed to create class\n", MODULE_NAME);
-		unregister_chrdev_region(gsys->chrdev_num, 1);
-		return -1;
-	}
+    if ((gsys->class = class_create(THIS_MODULE, MODULE_NAME)) == NULL) {
+        printk(KERN_ERR "%s: init failed to create class\n", MODULE_NAME);
+        unregister_chrdev_region(gsys->chrdev_num, 1);
+        return -1;
+    }
     
     // create the device
-	if ((gsys->dev = device_create(gsys->class, NULL, gsys->chrdev_num, NULL, MODULE_NAME)) == NULL) {
-	    printk(KERN_ERR "%s: init failed to create device\n", MODULE_NAME);
-		class_destroy(gsys->class);
-		unregister_chrdev_region(gsys->chrdev_num, 1);
-		return -1;
-	}
+    if ((gsys->dev = device_create(gsys->class, NULL, gsys->chrdev_num, NULL, MODULE_NAME)) == NULL) {
+        printk(KERN_ERR "%s: init failed to create device\n", MODULE_NAME);
+        class_destroy(gsys->class);
+        unregister_chrdev_region(gsys->chrdev_num, 1);
+        return -1;
+    }
 
     // init the chrdev
-	cdev_init(&gsys->chrdev, &fops);
-	if (cdev_add(&gsys->chrdev, gsys->chrdev_num, 1) == -1) {
-	    printk(KERN_ERR "%s: init failed to cdev_add\n", MODULE_NAME);
-		device_destroy(gsys->class, gsys->chrdev_num);
-		class_destroy(gsys->class);
-		unregister_chrdev_region(gsys->chrdev_num, 1);
-		return -1;
-	}
+    cdev_init(&gsys->chrdev, &fops);
+    if (cdev_add(&gsys->chrdev, gsys->chrdev_num, 1) == -1) {
+        printk(KERN_ERR "%s: init failed to cdev_add\n", MODULE_NAME);
+        device_destroy(gsys->class, gsys->chrdev_num);
+        class_destroy(gsys->class);
+        unregister_chrdev_region(gsys->chrdev_num, 1);
+        return -1;
+    }
     
     // allocate our buffer for dma transfers 
-	gsys->buffer = dma_zalloc_coherent(NULL, DMA_SIZE, &(gsys->dma_handle), GFP_KERNEL);
+    gsys->buffer = dma_zalloc_coherent(NULL, DMA_SIZE, &(gsys->dma_handle), GFP_KERNEL);
     gsys->buffer_size = DMA_SIZE;
 
-	if (!(gsys->buffer)) {
-		printk(KERN_ERR "%s: allocating dma memory failed\n", MODULE_NAME);
-		return -ENOMEM;
-	}
+    if (!(gsys->buffer)) {
+        printk(KERN_ERR "%s: allocating dma memory failed\n", MODULE_NAME);
+        return -ENOMEM;
+    }
 
 
-	dma_cap_zero(mask);
-	dma_cap_set(DMA_SLAVE | DMA_PRIVATE, mask);
-	
+    dma_cap_zero(mask);
+    dma_cap_set(DMA_SLAVE | DMA_PRIVATE, mask);
+    
     tx_chan = dma_request_slave_channel(&pdev->dev, "axidma0");
     if (!tx_chan) {
         printk(KERN_ERR "%s probe: no tx 'axidma0' channel found in dts.\n", MODULE_NAME);
@@ -1478,7 +1478,7 @@ static int gcore_probe(struct platform_device *pdev)
         printk(KERN_ERR "%s probe: unable to create gcore device\n", MODULE_NAME);
         goto free_rx;
     }
-	
+    
     printk(KERN_DEBUG "%s: gemini core subsystem initialized\n", MODULE_NAME);
     
     return 0;
@@ -1501,11 +1501,11 @@ static int gcore_remove(struct platform_device *pdev)
     struct gcore_dev *gdev = gsys->gdev;
     
     /* device destructor */
-	cdev_del(&gsys->chrdev);
-	device_destroy(gsys->class, gsys->chrdev_num);
-	class_destroy(gsys->class);
-	unregister_chrdev_region(gsys->chrdev_num, 1);
-	printk(KERN_DEBUG "%s exit: unregistered\n", MODULE_NAME);
+    cdev_del(&gsys->chrdev);
+    device_destroy(gsys->class, gsys->chrdev_num);
+    class_destroy(gsys->class);
+    unregister_chrdev_region(gsys->chrdev_num, 1);
+    printk(KERN_DEBUG "%s exit: unregistered\n", MODULE_NAME);
     
     // gdev better exist
     if(gdev) {
@@ -1530,9 +1530,9 @@ static int gcore_remove(struct platform_device *pdev)
     }
     
     /* free mmap area */
-	if (gsys->buffer) {
-		dma_free_coherent(NULL, DMA_SIZE, gsys->buffer, gsys->dma_handle);
-	}
+    if (gsys->buffer) {
+        dma_free_coherent(NULL, DMA_SIZE, gsys->buffer, gsys->dma_handle);
+    }
     
     // finally free the gcore system struct
     if(gsys) {
@@ -1544,13 +1544,13 @@ static int gcore_remove(struct platform_device *pdev)
 
 static int __init gcore_init(void)
 {
-	return platform_driver_register(&gemini_core_driver);
+    return platform_driver_register(&gemini_core_driver);
 }
 late_initcall(gcore_init);
 
 static void __exit gcore_exit(void)
 {
-	platform_driver_unregister(&gemini_core_driver);
+    platform_driver_unregister(&gemini_core_driver);
 }
 module_exit(gcore_exit);
 
