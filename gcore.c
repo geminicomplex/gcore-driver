@@ -1557,6 +1557,6 @@ module_exit(gcore_exit);
 MODULE_AUTHOR("Julian Lupu <julian@geminicomplex.com>");
 MODULE_LICENSE("Dual MIT/GPL");
 MODULE_DESCRIPTION("GEMINI CORE subsystem module");
-MODULE_VERSION("v1.2.0")
+MODULE_VERSION("v1.2.0");
 
 
