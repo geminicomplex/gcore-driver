@@ -470,7 +470,7 @@ static inline u32 subcore_run(struct gcore_system *gsys)
         reg_run, 
         !(reg_run & GCORE_CONTROL_RUN_MASK), 
         0, // delay us
-        10000 // timout us
+        30000 // timout us
     );
     
     // Run bit will de-assert right after subcore gets it,
@@ -488,8 +488,8 @@ static inline u32 subcore_run(struct gcore_system *gsys)
         gdev->regs+gdev->status_offset, 
         reg_running, 
         (reg_running & GCORE_STATUS_RUNNING_MASK), 
-        0, // delay us
-        2000000 // timout us
+        100000, // delay us
+        4000000 // timout us
     );
     
     if(rc_running){
